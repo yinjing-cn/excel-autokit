@@ -1,3 +1,5 @@
+![Excel AutoKit Banner](docs/images/banner.jpg)
+
 # Excel AutoKit
 
 **A pure Python CLI + library framework for Excel report automation — reconciliation, data cleaning, and report generation driven by YAML configuration.**
