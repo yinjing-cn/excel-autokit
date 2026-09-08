@@ -1,0 +1,84 @@
+# Excel AutoKit - Reconciliation Rules Configuration
+# This file defines how two Excel sources should be compared.
+
+reconciliation:
+  # Composite match key columns
+  match_keys:
+    columns:
+      - order_id
+      - sku
+    ignore_case: false
+
+  # Global numeric tolerance for comparisons
+  tolerance:
+    absolute: 0.01   # Allow 0.01 absolute difference
+    relative: 0.001  # Or 0.1% relative difference
+
+  # Per-column comparison configuration
+  compare_columns:
+    - name: quantity
+      tolerance: 0    # Exact match required
+    - name: amount
+      tolerance: 0.01 # Allow small rounding differences
+
+# Data cleaning pipeline definitions
+cleaning:
+  pipelines:
+    - name: standard_clean
+      operations:
+        - operation: string_format
+          columns:
+            - order_id
+            - sku
+          params:
+            strip: true
+            lower: false
+
+        - operation: date_format
+          columns:
+            - order_date
+          params:
+            format: "%Y-%m-%d"
+
+        - operation: number_format
+          columns:
+            - quantity
+            - amount
+
+        - operation: dedup
+          params:
+            subset:
+              - order_id
+              - sku
+
+    - name: aggressive_clean
+      operations:
+        - operation: string_format
+          columns:
+            - order_id
+            - sku
+          params:
+            strip: true
+            lower: true
+
+        - operation: fill_na
+          columns:
+            - quantity
+            - amount
+          params:
+            strategy: zero
+
+        - operation: dedup
+          params:
+            subset:
+              - order_id
+
+# Report generation settings
+reporting:
+  templates:
+    summary:
+      title: "Reconciliation Summary Report"
+      include_charts: true
+  output:
+    format: xlsx
+    highlight_differences: true
